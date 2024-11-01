@@ -1,4 +1,4 @@
-package com.sakesage.map.api.map.controller;
+package com.sakesage.map.domain.api.map.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

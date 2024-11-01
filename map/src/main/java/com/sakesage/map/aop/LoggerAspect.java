@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Aspect
 @Component
 public class LoggerAspect {
-    @Pointcut("execution(* com.rentmarket.backend.domain.*.controller..*(..)) || execution(* com.rentmarket.backend.domain.*.service..*(..)) || execution(* com.rentmarket.backend.domain.*.mapper..*(..))")
+    @Pointcut("execution(* com.sakesage.map..controller..*(..)) || execution(* com.sakesage.map..service..*(..)) || execution(* com.sakesage.map..mapper..*(..))")
     private void loggerTarget() {
 
     }
