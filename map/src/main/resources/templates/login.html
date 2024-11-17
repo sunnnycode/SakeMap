@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>사케 지도 관리자 페이지 - 로그인</title>
+    <script>
+        function login() {
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+
+            fetch('/open-api/user/login', {  // 상대 경로로 수정
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username: username, password: password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.result.resultCode === 200 && data.body.accessToken) {  // resultCode가 200이고 accessToken이 있으면 로그인 성공
+                    // 로그인 성공 후 JWT 토큰을 로컬스토리지에 저장
+                    localStorage.setItem('accessToken', data.body.accessToken);
+
+                    // 로그인 성공 후 admin-home 페이지로 리다이렉트
+                    window.location.href = '/adminHome';  // 관리자 홈 페이지로 리다이렉트
+                } else {
+                    alert('로그인 실패');
+                }
+            })
+            .catch(error => {
+                alert('로그인 중 오류 발생');
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</head>
+<body>
+<h1>로그인</h1>
+<form onsubmit="event.preventDefault(); login();">
+    <label for="username">아이디</label>
+    <input type="text" id="username" required><br>
+    <label for="password">비밀번호</label>
+    <input type="password" id="password" required><br>
+    <button type="submit">로그인</button>
+</form>
+
+<a href="/register">회원가입</a>
+</body>
+</html>

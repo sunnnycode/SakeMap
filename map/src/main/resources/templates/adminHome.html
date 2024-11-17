@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>관리자 홈페이지 - 가게 및 상품 등록</title>
+</head>
+<body>
+<h1>관리자 홈페이지</h1>
+
+<!-- 가게 등록 섹션 -->
+<h2>가게 등록</h2>
+<form id="store-register-form">
+    <label for="placeCode">장소 코드</label>
+    <input type="text" id="placeCode" required><br>
+    <label for="storeCategory">가게 카테고리</label>
+    <input type="text" id="storeCategory" required><br>
+    <button type="submit">가게 등록</button>
+</form>
+
+<hr>
+
+<!-- 상품 등록 섹션 -->
+<h2>상품 등록</h2>
+<form id="product-register-form">
+    <label for="storeId">가게 ID (경로 변수로 사용됨)</label>
+    <input type="number" id="storeId" required><br>
+
+    <label for="name">상품 이름</label>
+    <input type="text" id="name" required><br>
+
+    <label for="price">가격</label>
+    <input type="number" id="price" required><br>
+
+    <label for="content">상품 설명</label>
+    <textarea id="content" required></textarea><br>
+
+    <label for="productCategory">상품 카테고리</label>
+    <select id="productCategory" required>
+        <option value="WHISKY">WHISKY</option>
+        <option value="VODKA">VODKA</option>
+        <option value="RUM">RUM</option>
+        <option value="GIN">GIN</option>
+        <option value="TEQUILA">TEQUILA</option>
+    </select><br>
+
+    <label for="thumbnailUrl">썸네일 URL (여러 개 입력 가능)</label>
+    <input type="text" id="thumbnailUrl" placeholder="URL 입력" required><br>
+    <button type="button" id="addThumbnailUrl">썸네일 추가</button><br>
+
+    <button type="submit">상품 등록</button>
+</form>
+
+<script>
+    // 가게 등록 기능
+    document.getElementById('store-register-form').addEventListener('submit', function(event) {
+        event.preventDefault(); // 폼 제출 기본 동작 방지
+
+        const placeCode = document.getElementById('placeCode').value;
+        const storeCategory = document.getElementById('storeCategory').value;
+
+        // 가게 등록 API 호출
+        fetch('http://localhost:8080/api/store/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                placeCode: placeCode,
+                storeCategory: storeCategory
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.id) {
+                alert('가게 등록 성공');
+                console.log('등록된 가게 정보:', data);
+            } else {
+                alert('가게 등록 실패');
+            }
+        })
+        .catch(error => {
+            console.error('에러 발생:', error);
+            alert('가게 등록 중 오류 발생');
+        });
+    });
+
+    // 상품 등록 기능
+    let thumbnailUrls = [];  // 썸네일 URL을 저장할 배열
+
+    document.getElementById('addThumbnailUrl').addEventListener('click', function() {
+        const thumbnailUrl = document.getElementById('thumbnailUrl').value;
+        if (thumbnailUrl) {
+            thumbnailUrls.push(thumbnailUrl);  // 배열에 썸네일 URL 추가
+            document.getElementById('thumbnailUrl').value = '';  // 입력 필드 초기화
+            alert('썸네일 추가됨: ' + thumbnailUrl);
+        } else {
+            alert('썸네일 URL을 입력하세요.');
+        }
+    });
+
+    document.getElementById('product-register-form').addEventListener('submit', function(event) {
+        event.preventDefault(); // 폼 제출 기본 동작 방지
+
+        const storeId = document.getElementById('storeId').value; // storeId 경로 변수로 받음
+        const name = document.getElementById('name').value;
+        const price = document.getElementById('price').value;
+        const content = document.getElementById('content').value;
+        const productCategory = document.getElementById('productCategory').value;
+
+        // 상품 등록 API 호출
+        fetch(`http://localhost:8080/api/product/${storeId}?query=someQuery&thumbnail_url=${thumbnailUrls.join(',')}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                name: name,
+                price: price,
+                content: content,
+                productCategory: productCategory
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.code) {
+                alert('상품 등록 성공');
+                console.log('등록된 상품 정보:', data);
+            } else {
+                alert('상품 등록 실패');
+            }
+        })
+        .catch(error => {
+            console.error('에러 발생:', error);
+            alert('상품 등록 중 오류 발생');
+        });
+    });
+</script>
+</body>
+</html>
