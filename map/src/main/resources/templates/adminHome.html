@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>관리자홈페이지</title>
+</head>
+<body>
+<h1>가게 등록</h1>
+<form id="store-register-form">
+    <label for="placeCode">장소 코드</label>
+    <input type="text" id="placeCode" required><br>
+
+    <label for="storeCategory">가게 카테고리</label>
+    <select id="storeCategory" required>
+        <option value="WHISKY">WHISKY</option>
+        <option value="VODKA">VODKA</option>
+        <option value="RUM">RUM</option>
+        <option value="GIN">GIN</option>
+        <option value="TEQUILA">TEQUILA</option>
+        <!-- 여기에 다른 카테고리 값을 추가할 수 있습니다 -->
+    </select><br>
+
+    <button type="submit">등록</button>
+</form>
+
+<script>
+    document.getElementById('store-register-form').addEventListener('submit', function(event) {
+        event.preventDefault(); // 폼 제출 기본 동작 방지
+
+        const placeCode = document.getElementById('placeCode').value;
+        const storeCategory = document.getElementById('storeCategory').value;
+
+        // 가게 등록 API 호출
+        fetch('http://localhost:8080/api/store/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                placeCode: placeCode,
+                storeCategory: storeCategory
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.id) {
+                alert('가게 등록 성공');
+                console.log('등록된 가게 정보:', data);
+            } else {
+                alert('가게 등록 실패');
+            }
+        })
+        .catch(error => {
+            console.error('에러 발생:', error);
+            alert('등록 중 오류 발생');
+        });
+    });
+</script>
+</body>
+</html>

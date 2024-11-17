@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/product")
-@CrossOrigin(origins="http://localhost:3000", allowedHeaders="*")
+@CrossOrigin(origins = "http://localhost:8080", allowCredentials = "true")
 public class ProductApiController {
 
     private final ProductService productService;

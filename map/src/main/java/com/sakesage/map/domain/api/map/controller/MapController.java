@@ -9,6 +9,21 @@ public class MapController {
 
     @GetMapping("/")
     public String main() {
-        return "main"; // Ensure this returns "main" to match "main.html"
+        return "main";
+    }
+
+    @GetMapping("/register")
+    public String registerPage() {
+        return "register";
+    }
+
+    @GetMapping("/login")
+    public String loginPage() {
+        return "login";
+    }
+
+    @GetMapping("/adminHome")
+    public String adminHomePage() {
+        return "adminHome";
     }
 }

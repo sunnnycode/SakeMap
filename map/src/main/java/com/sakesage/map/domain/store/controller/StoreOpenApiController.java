@@ -14,7 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/open-api/store")
-@CrossOrigin(origins="http://localhost:3000", allowedHeaders="*")
+@CrossOrigin(origins = "http://localhost:8080", allowCredentials = "true")
 public class StoreOpenApiController {
 
     private final StoreService storeService;

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>사케 지도 관리자 페이지 - 회원가입</title>
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' chrome-extension://*;">
+    <script>
+        function register() {
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+
+            fetch('/open-api/user/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username: username, password: password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.result.resultCode === 200) {  // resultCode가 200이면 성공
+                    alert('회원가입 성공');
+                    window.location.href = '/login';  // 로그인 페이지로 리다이렉트
+                } else {
+                    alert('회원가입 실패');
+                }
+            })
+            .catch(error => {
+                alert('회원가입 중 오류 발생');
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</head>
+<body>
+<h1>회원가입</h1>
+<form onsubmit="event.preventDefault(); register();">
+    <label for="username">아이디</label>
+    <input type="text" id="username" required><br>
+    <label for="password">비밀번호</label>
+    <input type="password" id="password" required><br>
+    <button type="submit">회원가입</button>
+</form>
+
+<a href="/login">로그인</a>
+</body>
+</html>

@@ -13,7 +13,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/open-api/product")
-@CrossOrigin(origins="http://localhost:3000")
+@CrossOrigin(origins = "http://localhost:8080", allowCredentials = "true")
 public class ProductOpenApiController {
 
     private final ProductService productService;
