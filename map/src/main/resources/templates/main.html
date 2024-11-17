@@ -10,28 +10,49 @@
                 zoom: 12
             });
 
-            // 플레이스 ID를 사용하여 장소 정보를 요청
-            var service = new google.maps.places.PlacesService(map);
-            service.getDetails({placeCode: 'ChIJoWCjwuWLGGARLl-ktwyr3KY'}, (place, status) => {
-                if (status === google.maps.places.PlacesServiceStatus.OK) {
-                    // 커스텀 마커 이미지 URL
-                    var customMarker = {
-                        url: 'https://maps.google.com/mapfiles/ms/icons/red-dot.png', // 빨간색 마커 이미지 URL
-                        scaledSize: new google.maps.Size(32, 32) // 마커 크기 설정
-                    };
+            // 가게 전체 조회 API 호출
+            fetch('http://localhost:8080/open-api/store/') // 실제 API URL로 변경
+                .then(response => response.json())
+                .then(stores => {
+                    console.log('가게 목록:', stores);  // 가게 목록 로그 출력
 
-                    // 마커 생성
-                    var marker = new google.maps.Marker({
-                        position: place.geometry.location, // 플레이스의 위치
-                        map: map, // 마커가 표시될 지도
-                        title: place.name, // 마커에 마우스를 올렸을 때 표시되는 제목
-                        icon: customMarker // 커스텀 마커 설정
+                    // 가게 리스트에서 각 가게에 대해 마커 추가
+                    stores.forEach(store => {
+                        const placeCode = store.placeCode;
+                        console.log('처리 중인 placeCode:', placeCode);  // placeCode 로그 출력
+
+                        // 플레이스 ID를 사용하여 장소 정보를 요청
+                        var service = new google.maps.places.PlacesService(map);
+                        service.getDetails({placeId: placeCode}, (place, status) => {
+                            console.log('플레이스 정보 응답:', place);  // 플레이스 정보 로그 출력
+                            console.log('상태:', status);  // 상태 로그 출력
+
+                            if (status === google.maps.places.PlacesServiceStatus.OK) {
+                                // 커스텀 마커 이미지 URL
+                                var customMarker = {
+                                    url: 'https://maps.google.com/mapfiles/ms/icons/red-dot.png', // 빨간색 마커 이미지 URL
+                                    scaledSize: new google.maps.Size(32, 32) // 마커 크기 설정
+                                };
+
+                                // 마커 생성
+                                var marker = new google.maps.Marker({
+                                    position: place.geometry.location, // 플레이스의 위치
+                                    map: map, // 마커가 표시될 지도
+                                    title: place.name, // 마커에 마우스를 올렸을 때 표시되는 제목
+                                    icon: customMarker // 커스텀 마커 설정
+                                });
+
+                                // 맵을 플레이스 위치로 이동
+                                map.setCenter(place.geometry.location);
+                            } else {
+                                console.log('플레이스 정보 로딩 실패:', status);  // 상태가 OK가 아닐 경우 로그 출력
+                            }
+                        });
                     });
-
-                    // 맵을 플레이스 위치로 이동
-                    map.setCenter(place.geometry.location);
-                }
-            });
+                })
+                .catch(error => {
+                    console.error('에러 발생:', error);
+                });
         }
     </script>
     <style>
