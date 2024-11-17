@@ -2,6 +2,7 @@ package com.sakesage.map.domain.product.service;
 
 import com.sakesage.map.db.product.Product;
 import com.sakesage.map.db.product.ProductRepository;
+import com.sakesage.map.db.product.enums.ProductCategory;
 import com.sakesage.map.db.store.Store;
 import com.sakesage.map.db.store.StoreRepository;
 import com.sakesage.map.domain.product.dto.ProductRequest;
@@ -11,7 +12,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -92,5 +95,43 @@ public class ProductServiceImpl implements ProductService {
         }
         productRepository.delete(product);
     }
+
+    // 전체 상품 조회
+    @Override
+    public List<ProductResponse> getAllProducts() {
+        List<Product> products = productRepository.findAll();
+
+        return products.stream()
+                .map(product -> modelMapper.map(product, ProductResponse.class))
+                .collect(Collectors.toList());
+    }
+
+    // 단일 상품 조회
+    @Override
+    public ProductResponse getProductByCode(int productCode) {
+        Product product = productRepository.findById(productCode).orElse(null);
+
+        if (product == null) {
+            throw new RuntimeException("Product not found with code: " + productCode);
+        }
+        return modelMapper.map(product, ProductResponse.class);
+    }
+
+    // 카테고리 내 전체 상품 조회
+    @Override
+    public List<ProductResponse> getProductByProductCategory(ProductCategory productCategory) {
+        List<Product> products = productRepository.findByProductCategory(productCategory);
+
+        if (products.isEmpty()) {
+            throw new RuntimeException("No products found for category: " + productCategory);
+        }
+
+        return products.stream()
+                .map(product -> modelMapper.map(product, ProductResponse.class))
+                .collect(Collectors.toList());
+
+    }
+
+
 
 }
