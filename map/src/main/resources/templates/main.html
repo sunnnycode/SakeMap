@@ -14,19 +14,13 @@
             fetch('http://localhost:8080/open-api/store/') // 실제 API URL로 변경
                 .then(response => response.json())
                 .then(stores => {
-                    console.log('가게 목록:', stores);  // 가게 목록 로그 출력
-
                     // 가게 리스트에서 각 가게에 대해 마커 추가
                     stores.forEach(store => {
                         const placeCode = store.placeCode;
-                        console.log('처리 중인 placeCode:', placeCode);  // placeCode 로그 출력
 
                         // 플레이스 ID를 사용하여 장소 정보를 요청
                         var service = new google.maps.places.PlacesService(map);
                         service.getDetails({placeId: placeCode}, (place, status) => {
-                            console.log('플레이스 정보 응답:', place);  // 플레이스 정보 로그 출력
-                            console.log('상태:', status);  // 상태 로그 출력
-
                             if (status === google.maps.places.PlacesServiceStatus.OK) {
                                 // 커스텀 마커 이미지 URL
                                 var customMarker = {
@@ -40,6 +34,24 @@
                                     map: map, // 마커가 표시될 지도
                                     title: place.name, // 마커에 마우스를 올렸을 때 표시되는 제목
                                     icon: customMarker // 커스텀 마커 설정
+                                });
+
+                                // 정보 창 생성
+                                var infowindow = new google.maps.InfoWindow();
+
+                                // 마커 클릭 시 정보 창 표시
+                                google.maps.event.addListener(marker, 'click', function() {
+                                    var contentString = `
+                                        <div>
+                                            <h3>${place.name}</h3>
+                                            <p><strong>주소:</strong> ${place.formatted_address}</p>
+                                            <p><strong>전화:</strong> ${place.formatted_phone_number || '정보 없음'}</p>
+                                            <p><strong>웹사이트:</strong> <a href="${place.website}" target="_blank">${place.website || '없음'}</a></p>
+                                        </div>
+                                    `;
+
+                                    infowindow.setContent(contentString);
+                                    infowindow.open(map, marker); // 정보 창을 해당 마커 위에 열기
                                 });
 
                                 // 맵을 플레이스 위치로 이동
