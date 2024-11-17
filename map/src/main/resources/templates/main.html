@@ -12,7 +12,7 @@
 
             // 플레이스 ID를 사용하여 장소 정보를 요청
             var service = new google.maps.places.PlacesService(map);
-            service.getDetails({placeId: 'ChIJoWCjwuWLGGARLl-ktwyr3KY'}, (place, status) => {
+            service.getDetails({placeCode: 'ChIJoWCjwuWLGGARLl-ktwyr3KY'}, (place, status) => {
                 if (status === google.maps.places.PlacesServiceStatus.OK) {
                     // 커스텀 마커 이미지 URL
                     var customMarker = {

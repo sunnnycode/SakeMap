@@ -1,8 +1,9 @@
 package com.sakesage.map.domain.store.service;
 
 import com.sakesage.map.domain.store.dto.StoreRequest;
+import com.sakesage.map.domain.store.dto.StoreResponse;
 
 public interface StoreService {
 
-    void storeAdd(StoreRequest storeRequest) throws Exception;
+    StoreResponse storeRegister(StoreRequest storeRequest);
 }

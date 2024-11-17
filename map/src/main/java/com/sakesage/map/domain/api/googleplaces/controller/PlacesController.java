@@ -13,7 +13,7 @@ public class PlacesController {
     private GooglePlacesService googlePlacesService;
 
     @GetMapping("/place-details")
-    public String getPlaceDetails(@RequestParam String placeId) {
-        return googlePlacesService.getPlaceDetails(placeId);
+    public String getPlaceDetails(@RequestParam String placeCode) {
+        return googlePlacesService.getPlaceDetails(placeCode);
     }
 }

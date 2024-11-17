@@ -13,8 +13,8 @@ public class GooglePlacesService {
     @Autowired
     private RestTemplate restTemplate;
 
-    public String getPlaceDetails(String placeId) {
-        String url = String.format("%s?place_id=%s&key=%s", BASE_URL, placeId, API_KEY);
+    public String getPlaceDetails(String placeCode) {
+        String url = String.format("%s?place_id=%s&key=%s", BASE_URL, placeCode, API_KEY);
         return restTemplate.getForObject(url, String.class);
     }
 }
