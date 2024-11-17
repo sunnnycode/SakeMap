@@ -9,8 +9,8 @@ import java.util.List;
 public interface StoreService {
 
     StoreResponse storeRegister(StoreRequest storeRequest);
-    StoreResponse storeUpdate(int id, StoreUpdateRequest storeUpdateRequest);
-    void storeDelete(int id);
+    StoreResponse storeUpdate(int storeId, StoreUpdateRequest storeUpdateRequest);
+    void storeDelete(int storeId);
     List<StoreResponse> getAllStores();
 
 }

@@ -42,13 +42,13 @@ public class StoreServiceImpl implements StoreService {
 
     // 가게 수정
     @Override
-    public StoreResponse storeUpdate(int id, StoreUpdateRequest storeUpdateRequest) {
+    public StoreResponse storeUpdate(int storeId, StoreUpdateRequest storeUpdateRequest) {
 
         // 요청에서 받은 storeId를 이용해 가게 정보 조회
-        Optional<Store> optionalStore = storeRepository.findById(id);
+        Optional<Store> optionalStore = storeRepository.findById(storeId);
 
         if (!optionalStore.isPresent()) {
-            throw new RuntimeException("Store not found with id " + id);
+            throw new RuntimeException("Store not found with id " + storeId);
         }
 
         // 기존 가게 정보 가져오기
@@ -62,13 +62,13 @@ public class StoreServiceImpl implements StoreService {
 
     // 가게 삭제
     @Override
-    public void storeDelete(int id) {
+    public void storeDelete(int storeId) {
 
         // 요청에서 받은 storeId를 이용해 가게 정보 조회
-        Optional<Store> optionalStore = storeRepository.findById(id);
+        Optional<Store> optionalStore = storeRepository.findById(storeId);
 
         if (!optionalStore.isPresent()) {
-            throw new RuntimeException("Store not found with id " + id);
+            throw new RuntimeException("Store not found with id " + storeId);
         }
 
         Store store = optionalStore.get();

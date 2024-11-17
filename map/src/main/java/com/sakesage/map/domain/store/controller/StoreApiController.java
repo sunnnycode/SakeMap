@@ -30,19 +30,19 @@ public class StoreApiController {
     // 가게 수정
     @PutMapping("/{storeId}")
     public ResponseEntity<StoreResponse> storeUpdate(
-            @PathVariable("storeId") int id,
+            @PathVariable int storeId,
             @RequestBody StoreUpdateRequest storeUpdateRequest
             ) {
-        StoreResponse storeResponse = storeService.storeUpdate(id, storeUpdateRequest);
+        StoreResponse storeResponse = storeService.storeUpdate(storeId, storeUpdateRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(storeResponse);
     }
 
     // 가게 삭제
     @DeleteMapping("/{storeId}")
     public ResponseEntity<String> storeDelete (
-            @PathVariable("storeId") int id
+            @PathVariable int storeId
     ) {
-        storeService.storeDelete(id);
+        storeService.storeDelete(storeId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body("success");
     }
 
