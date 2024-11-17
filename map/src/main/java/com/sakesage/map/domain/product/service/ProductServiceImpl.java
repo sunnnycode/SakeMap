@@ -129,6 +129,20 @@ public class ProductServiceImpl implements ProductService {
         return products.stream()
                 .map(product -> modelMapper.map(product, ProductResponse.class))
                 .collect(Collectors.toList());
+    }
+
+    // 가게 별 상품 전체 조회
+    @Override
+    public List<ProductResponse> getProductByStoreId(int storeId) {
+        List<Product> products = productRepository.findProductByStoreId(storeId);
+
+        if (products.isEmpty()) {
+            throw new RuntimeException("No products found for storeId " + storeId);
+        }
+
+        return products.stream()
+                .map(product -> modelMapper.map(product, ProductResponse.class))
+                .collect(Collectors.toList());
 
     }
 

@@ -41,9 +41,18 @@ public class ProductOpenApiController {
 
     // 상품 카테고리 상세 조회
     @GetMapping("/category/{category}")
-    public ResponseEntity<List<ProductResponse>> getProductByCategory(@RequestParam ProductCategory productCategory) {
+    public ResponseEntity<List<ProductResponse>> getProductByCategory(
+            @RequestParam ProductCategory productCategory) {
         List<ProductResponse> productResponseList = productService.getProductByProductCategory(productCategory);
         return ResponseEntity.ok(productResponseList);
+    }
+
+    // 가게별 상품 전체 조회
+    @GetMapping("{storeId}")
+    public ResponseEntity<List<ProductResponse>> getProductByStoreId(
+            @PathVariable("storeId") int storeId) {
+        List<ProductResponse> productResponsesList = productService.getProductByStoreId(storeId);
+        return ResponseEntity.ok(productResponsesList);
     }
 
 }
