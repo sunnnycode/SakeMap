@@ -48,7 +48,7 @@ public class ProductOpenApiController {
     }
 
     // 가게별 상품 전체 조회
-    @GetMapping("{storeId}")
+    @GetMapping("/storeId/{storeId}")
     public ResponseEntity<List<ProductResponse>> getProductByStoreId(
             @PathVariable("storeId") int storeId) {
         List<ProductResponse> productResponsesList = productService.getProductByStoreId(storeId);
