@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class StoreRequest {
+public class StoreUpdateRequest {
 
     @NotNull
     private String placeCode;
