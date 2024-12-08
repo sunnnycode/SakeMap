@@ -3,134 +3,183 @@
 <head>
     <title>일본 사케 지도</title>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCkAAj6kvP-nK9QK8-SmP-sKIOiL49R0Jo&libraries=places"></script>
-    <script>
-        function initMap() {
-            var map = new google.maps.Map(document.getElementById('map'), {
-                center: {lat: 35.6762, lng: 139.6503}, // 도쿄의 위도와 경도
-                zoom: 12
-            });
-
-            // 가게 전체 조회 API 호출
-            fetch('http://localhost:8080/open-api/store/') // 실제 API URL로 변경
-                .then(response => response.json())
-                .then(stores => {
-                    stores.forEach(store => {
-                        const placeCode = store.placeCode;
-
-                        // 플레이스 ID를 사용하여 장소 정보를 요청
-                        var service = new google.maps.places.PlacesService(map);
-                        service.getDetails({placeId: placeCode}, (place, status) => {
-                            if (status === google.maps.places.PlacesServiceStatus.OK) {
-                                var customMarker = {
-                                    url: 'https://maps.google.com/mapfiles/ms/icons/red-dot.png', // 빨간색 마커 이미지
-                                    scaledSize: new google.maps.Size(32, 32) // 마커 크기 설정
-                                };
-
-                                // 마커 생성 및 store.id 추가
-                                var marker = new google.maps.Marker({
-                                    position: place.geometry.location,
-                                    map: map,
-                                    title: place.name,
-                                    icon: customMarker,
-                                    storeId: store.id // store.id를 마커에 저장
-                                });
-
-                                // 정보 창 생성
-                                var infowindow = new google.maps.InfoWindow();
-
-                                // 마커 클릭 시 기본 정보 및 상품 목록 탭 생성
-                                google.maps.event.addListener(marker, 'click', function() {
-                                    console.log('Clicked marker storeId:', store.id); // store.id 로그 출력
-                                    var contentString = `
-                                        <div>
-                                            <h3>${place.name}</h3>
-                                            <p><strong>주소:</strong> ${place.formatted_address}</p>
-                                            <p><strong>전화:</strong> ${place.formatted_phone_number || '정보 없음'}</p>
-                                            <p><strong>웹사이트:</strong> <a href="${place.website}" target="_blank">${place.website || '없음'}</a></p>
-                                        </div>
-                                    `;
-
-                                    infowindow.setContent(contentString);
-                                    infowindow.open(map, marker); // 정보 창을 해당 마커 위에 열기
-
-                                    // `this`를 사용해 마커의 storeId에 접근
-                                    displayProductTab(this.storeId);
-                                });
-
-                                map.setCenter(place.geometry.location); // 맵을 플레이스 위치로 이동
-                            } else {
-                                console.log('플레이스 정보 로딩 실패:', status); // 상태가 OK가 아닐 경우 로그 출력
-                            }
-                        });
-                    });
-                })
-                .catch(error => {
-                    console.error('에러 발생:', error);
-                });
-        }
-
-        // 상품 목록 탭을 보여주는 함수
-        function displayProductTab(storeId) {
-            fetch(`http://localhost:8080/open-api/product/storeId/${storeId}`)
-                .then(response => response.json())
-                .then(products => {
-                    const productTab = document.getElementById('product-tab');
-                    productTab.innerHTML = ''; // 기존 내용 제거
-
-                    const productList = document.createElement('ul');
-                    products.forEach(product => {
-                        const productItem = document.createElement('li');
-                        productItem.innerHTML = `
-                            <div>
-                                <strong>${product.name}</strong><br>
-                                가격: ${product.price}원<br>
-                                카테고리: ${product.productCategory}<br>
-                                <p>${product.content}</p>
-                                ${product.thumbnailUrl ? `<img src="${product.thumbnailUrl}" alt="${product.name}" style="width:100px; height:auto;">` : '<p>썸네일 이미지 없음</p>'}
-                            </div>
-                        `;
-                        productList.appendChild(productItem);
-                    });
-
-                    productTab.appendChild(productList);
-                    document.getElementById('product-container').style.display = 'block'; // 상품 목록 탭을 표시
-                })
-                .catch(error => {
-                    console.error('상품 목록 로딩 실패:', error);
-                });
-        }
-    </script>
     <style>
         html, body {
-            height: 100%; /* HTML과 BODY의 높이를 100%로 설정 */
-            margin: 0; /* 기본 여백 제거 */
+            height: 100%;
+            margin: 0;
+            font-family: Arial, sans-serif;
         }
         #map {
-            height: 100%; /* 지도의 높이를 100%로 설정 */
-            width: 100%; /* 지도의 너비를 100%로 설정 */
+            height: 100%;
+            width: 100%;
         }
-        #product-container {
-            display: none; /* 상품 목록 탭 숨기기 */
+         #side-panel {
+        position: fixed;
+        top: 0;
+        left: -400px; /* 기본적으로 화면 밖에 위치 */
+        right: auto; /* 오른쪽 고정 해제 */
+        width: 400px;
+        height: 100%;
+        background-color: white;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2); /* 그림자 방향 변경 */
+        z-index: 1000;
+        transition: left 0.3s ease; /* 슬라이드 애니메이션 */
+        overflow-y: auto;
+        padding: 15px;
+    }
+    #side-panel.open {
+        left: 0; /* 열렸을 때 화면 안으로 들어옴 */
+    }
+        #side-panel h3 {
+            margin-top: 0;
+        }
+        #close-panel-btn {
+            background-color: #ff6666;
+            border: none;
+            color: white;
+            padding: 10px;
+            font-size: 14px;
+            cursor: pointer;
             position: absolute;
             top: 10px;
             right: 10px;
-            width: 300px;
-            background-color: white;
-            padding: 10px;
             border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
         #product-tab {
-            max-height: 400px;
-            overflow-y: auto;
+            display: none;
+        }
+        #menu-btn {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        #menu-btn:hover {
+            background-color: #45a049;
         }
     </style>
 </head>
 <body onload="initMap()">
-<div id="map"></div> <!-- 맵 DIV -->
-<div id="product-container">
-    <h3>상품 목록</h3>
-    <div id="product-tab"></div>
+<div id="map"></div>
+<div id="side-panel">
+    <button id="close-panel-btn" onclick="closePanel()">닫기</button>
+    <div id="place-info">
+        <h3 id="place-name"></h3>
+        <p><strong>주소:</strong> <span id="place-address"></span></p>
+        <p><strong>전화:</strong> <span id="place-phone"></span></p>
+        <p><strong>웹사이트:</strong> <a id="place-website" href="#" target="_blank">열기</a></p>
+        <div id="place-photo"></div>
+    </div>
+    <button id="menu-btn" onclick="toggleProductTab()">메뉴</button>
+    <div id="product-tab">
+        <h3>상품 목록</h3>
+        <ul id="product-list"></ul>
+    </div>
 </div>
+<script>
+    let currentOpenMarker = null; // 현재 열려 있는 마커 추적
+
+    function initMap() {
+        const map = new google.maps.Map(document.getElementById('map'), {
+            center: { lat: 35.6762, lng: 139.6503 }, // 도쿄의 위도와 경도
+            zoom: 12
+        });
+
+        fetch('http://localhost:8080/open-api/store/') // 가게 목록 API 호출
+            .then(response => response.json())
+            .then(stores => {
+                stores.forEach(store => {
+                    const placeCode = store.placeCode;
+
+                    // 구글 Place API로 장소 정보 가져오기
+                    const service = new google.maps.places.PlacesService(map);
+                    service.getDetails({ placeId: placeCode }, (place, status) => {
+                        if (status === google.maps.places.PlacesServiceStatus.OK) {
+                            const marker = new google.maps.Marker({
+                                position: place.geometry.location,
+                                map: map,
+                                title: place.name
+                            });
+
+                            google.maps.event.addListener(marker, 'click', function () {
+                                // 다른 마커 클릭 시 패널 닫기
+                                if (currentOpenMarker && currentOpenMarker !== marker) {
+                                    closePanel();
+                                }
+                                currentOpenMarker = marker;
+
+                                // 패널 열기
+                                openPanel(place, store.id);
+                            });
+                        }
+                    });
+                });
+            });
+    }
+
+    function openPanel(place, storeId) {
+        document.getElementById('place-name').textContent = place.name || '이름 없음';
+        document.getElementById('place-address').textContent = place.formatted_address || '주소 없음';
+        document.getElementById('place-phone').textContent = place.formatted_phone_number || '전화번호 없음';
+        document.getElementById('place-website').href = place.website || '#';
+        document.getElementById('place-website').textContent = place.website ? '열기' : '없음';
+
+        const photoContainer = document.getElementById('place-photo');
+        photoContainer.innerHTML = ''; // 기존 사진 제거
+        if (place.photos && place.photos.length > 0) {
+            const photoUrl = place.photos[0].getUrl({ maxWidth: 400 });
+            const img = document.createElement('img');
+            img.src = photoUrl;
+            img.style.width = '100%';
+            photoContainer.appendChild(img);
+        } else {
+            photoContainer.textContent = '사진 없음';
+        }
+
+        document.getElementById('side-panel').classList.add('open');
+        document.getElementById('product-tab').style.display = 'none'; // 상품 탭 닫기
+
+        // 상품 데이터 로딩 준비
+        document.getElementById('menu-btn').onclick = () => loadProductTab(storeId);
+    }
+
+   function closePanel() {
+        document.getElementById('side-panel').classList.remove('open');
+        currentOpenMarker = null; // 열려 있는 마커 초기화
+    }
+
+    function toggleProductTab() {
+        const productTab = document.getElementById('product-tab');
+        productTab.style.display = productTab.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function loadProductTab(storeId) {
+        fetch(`http://localhost:8080/open-api/product/storeId/${storeId}`)
+            .then(response => response.json())
+            .then(products => {
+                const productList = document.getElementById('product-list');
+                productList.innerHTML = ''; // 기존 상품 목록 제거
+
+                products.forEach(product => {
+                    const productItem = document.createElement('li');
+                    productItem.innerHTML = `
+                        <div>
+                            <strong>${product.name}</strong><br>
+                            가격: ${product.price}원<br>
+                            카테고리: ${product.productCategory}<br>
+                            <p>${product.content}</p>
+                            ${product.thumbnailUrl ? `<img src="${product.thumbnailUrl}" alt="${product.name}" style="width:100px;">` : '<p>썸네일 이미지 없음</p>'}
+                        </div>
+                    `;
+                    productList.appendChild(productItem);
+                });
+
+                toggleProductTab(); // 상품 탭 열기
+            });
+    }
+</script>
 </body>
 </html>
